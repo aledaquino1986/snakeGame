@@ -5,11 +5,13 @@ let squares = [];
 
 let currentSnake = [2, 1, 0];
 let direction = 1;
+const width = 10;
+let appleIndex = 0;
 
 function createGrid() {
   //create 100 of these elements with a for loop
 
-  for (let i = 0; i < 100; i++) {
+  for (let i = 0; i < width * width; i++) {
     //create element
     const square = document.createElement("div");
 
@@ -27,6 +29,20 @@ createGrid();
 currentSnake.forEach(index => squares[index].classList.add("snake"));
 
 function move() {
+  if (
+    // //if snake has hit bottom
+    (currentSnake[0] + width >= width * width && direction === width) ||
+    // if snake has hit right wall
+    (currentSnake[0] % width === width - 1 && direction === 1) ||
+    // if snake has hit left wall
+    (currentSnake[0] % width === 0 && direction === -1) ||
+    // if snake has hit top
+    (currentSnake[0] - width < 0 && direction === -width) ||
+    squares[currentSnake[0] + direction].classList.contains("snake")
+  ) {
+    return clearInterval(timerId);
+  }
+
   //remove last element from our currentSnake array.
   const tail = currentSnake.pop();
 
@@ -42,15 +58,31 @@ let timerId = setInterval(() => {
   move();
 }, 1000);
 
+function generateApples() {
+  do {
+    //generate a random number
+    appleIndex = Math.floor(Math.random() * squares.length);
+  } while (squares[appleIndex].classList.contains("snake"));
+  {
+    squares[appleIndex].classList.add("apple");
+  }
+}
+
+generateApples();
+
 function control(e) {
   if (e.keyCode === 39) {
     console.log("right pressed");
+    direction = 1;
   } else if (e.keyCode === 38) {
     console.log("up arrow pressed");
+    direction = -width;
   } else if (e.keyCode === 37) {
     console.log("left arrow pressed");
+    direction = -1;
   } else if (e.keyCode === 40) {
     console.log("down arrow pressed");
+    direction = +width;
   }
 }
 
